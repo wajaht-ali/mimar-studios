@@ -3,6 +3,7 @@ const globalErrorHandler = (err, req, res, next) => {
   const nodeEnv = process.env.NODE_ENV;
 
   res.status(statusCode).json({
+    success: err.success,
     message: err.message,
     errorStack: nodeEnv === "development" ? err.stack : "",
   });
