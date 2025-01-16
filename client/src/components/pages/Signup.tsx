@@ -6,7 +6,9 @@ import { FcGoogle } from "react-icons/fc";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Spinners from "../Spinners";
 import logo from "../../assets/mimar_Logo-nobg.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const signupSchema = z.object({
   name: z.string().min(1, "Name is required."),
@@ -17,6 +19,7 @@ const signupSchema = z.object({
 type SignupFormValues = z.infer<typeof signupSchema>;
 
 const Signup: React.FC = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -25,8 +28,28 @@ const Signup: React.FC = () => {
     resolver: zodResolver(signupSchema),
   });
 
-  const onSubmit = (data: SignupFormValues) => {
-    console.log("Form Data:", data);
+  const API_URL = import.meta.env.VITE_APP_URL;
+  const onSubmit = async (data: SignupFormValues) => {
+    try {
+      const { name, email, password } = data;
+      const res = await axios.post(`${API_URL}/signup`, {
+        name,
+        email,
+        password,
+      });
+      console.log("res is: ", res);
+      if (res.data.success) {
+        toast.success("Signup successfull!");
+        navigate("/login");
+      } else {
+        toast.error(`${res.data.message}`);
+      }
+    } catch (error) {
+      if(axios.isAxiosError(error)) {
+        toast.error(`Please try again.`);
+      }
+      console.log(`Unexpredted Error Occured! ${error}`);
+    }
   };
 
   return (
@@ -34,7 +57,10 @@ const Signup: React.FC = () => {
       <div className="bg-light p-6 rounded-tl-lg rounded-bl-lg shadow-md w-full max-w-md h-[600px]">
         <h2 className="text-3xl font-bold text-start text-primary">Signup</h2>
         <p className="text-sm text-gray-500 text-start mt-2">
-          Already have an account? <Link to={"/login"} className="text-primary font-medium">Login here</Link>
+          Already have an account?{" "}
+          <Link to={"/login"} className="text-primary font-medium">
+            Login here
+          </Link>
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="mt-6">
@@ -88,7 +114,7 @@ const Signup: React.FC = () => {
 
           <button
             type="submit"
-            className={`w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 focus:outline-none focus:ring focus:ring-indigo-300 mt-6 ${
+            className={`w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 focus:outline-none flex text-center items-center justify-center focus:ring focus:ring-indigo-300 mt-6 ${
               isSubmitting ? "disabled" : ""
             }`}
           >
