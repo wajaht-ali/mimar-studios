@@ -6,6 +6,7 @@ import { MdEmail } from "react-icons/md";
 import RandomQuote from "../components/Quote.tsx";
 import { Link as Goto } from "react-scroll";
 import UserDataTable from "./others/UserDataTable.tsx";
+import ThreeDCube from "./Cube.tsx";
 
 interface UserDataTypes {
   id: string;
@@ -90,8 +91,12 @@ const Home = () => {
         <RandomQuote />
       </div>
 
-      <div id="quote" className="w-full rounded-3xl mt-4">
+      <div className="w-full rounded-3xl mt-4">
         <UserDataTable />
+      </div>
+
+      <div className="w-full rounded-3xl mt-4">
+        <ThreeDCube />
       </div>
     </div>
   );
