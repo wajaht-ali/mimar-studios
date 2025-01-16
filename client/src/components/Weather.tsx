@@ -2,10 +2,11 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import CardSkeleton from "./others/CardSkeleton";
 
 interface WheatherData {
   name: string;
-  country: string,
+  country: string;
   localTime: string;
   temprature: number;
   wind_kph: number;
@@ -18,6 +19,7 @@ interface WheatherData {
 }
 const WeatherCard: React.FC = () => {
   const [city] = useState<string>("Islamabad");
+  const [loading, setLoading] = useState<boolean>(true);
   const [data, setData] = useState<WheatherData>({
     name: "",
     country: "",
@@ -28,7 +30,7 @@ const WeatherCard: React.FC = () => {
     vis_km: 0,
     condition: {
       icon: "",
-      text: ""
+      text: "",
     },
   });
   const API_KEY = import.meta.env.VITE_WEATHER_API;
@@ -36,7 +38,6 @@ const WeatherCard: React.FC = () => {
   const getWeatherData = async () => {
     try {
       const res = await axios.get(`${BASE_URL}&q=${city}`);
-      console.log("Weather res: ", res);
       const weatherData = {
         name: res.data.location.name,
         localTime: res.data.location.localtime,
@@ -52,7 +53,7 @@ const WeatherCard: React.FC = () => {
       };
 
       setData(weatherData);
-      console.log("Updated data: ", weatherData);
+      setLoading(false);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         toast.error("Unexpected error occured");
@@ -65,41 +66,49 @@ const WeatherCard: React.FC = () => {
   }, [city]);
 
   return (
-    <div className="max-w-xs mx-auto bg-white shadow-lg rounded-lg p-6">
-      <div className="text-gray-700 text-sm mb-2">
-        <div className="text-xl text-primary font-medium">{data.name}, {data.country}</div>
-        <div>{data.localTime.split(" ")[0]}</div>
-      </div>
-      <div className="flex justify-center my-4">
-        <div className="text-blue-500">
-          <img
-            src={data.condition.icon}
-            alt="img_icon"
-            className="size-16 object-contain"
-          />
+    <>
+      {loading ? (
+        <CardSkeleton />
+      ) : (
+        <div className="max-w-xs mx-auto bg-white shadow-lg rounded-lg p-6">
+          <div className="text-gray-700 text-sm mb-2">
+            <div className="text-xl text-primary font-medium">
+              {data.name}, {data.country}
+            </div>
+            <div>{data.localTime.split(" ")[0]}</div>
+          </div>
+          <div className="flex justify-center my-4">
+            <div className="text-blue-500">
+              <img
+                src={data.condition.icon}
+                alt="img_icon"
+                className="size-16 object-contain"
+              />
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="text-6xl font-bold text-gray-800">
+              {Math.floor(data.temprature)}° C
+            </div>
+            <div className="text-gray-500">{data.condition.text}</div>
+          </div>
+          <div className="flex justify-between text-gray-600 mt-4">
+            <div className="text-center">
+              <div className="text-sm">Wind</div>
+              <div className="font-medium">{data.wind_kph}k/h</div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm">Humidity</div>
+              <div className="font-medium">{data.humidity}%</div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm">Visibility</div>
+              <div className="font-medium">{data.vis_km}km</div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="text-center">
-        <div className="text-6xl font-bold text-gray-800">
-          {Math.floor(data.temprature)}° C
-        </div>
-        <div className="text-gray-500">{data.condition.text}</div>
-      </div>
-      <div className="flex justify-between text-gray-600 mt-4">
-        <div className="text-center">
-          <div className="text-sm">Wind</div>
-          <div className="font-medium">{data.wind_kph}k/h</div>
-        </div>
-        <div className="text-center">
-          <div className="text-sm">Humidity</div>
-          <div className="font-medium">{data.humidity}%</div>
-        </div>
-        <div className="text-center">
-          <div className="text-sm">Visibility</div>
-          <div className="font-medium">{data.vis_km}km</div>
-        </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 
