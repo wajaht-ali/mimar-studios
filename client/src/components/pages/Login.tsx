@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Spinners from "../Spinners";
 import logo from "../../assets/mimar_Logo-nobg.png";
+import { GoogleLogin } from "@react-oauth/google";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -34,7 +34,7 @@ const Login: React.FC = () => {
         email,
         password,
       });
-      console.log("res is: ", res);
+
       if (res.data.success) {
         toast.success("Login successfully!");
         sessionStorage.setItem("jwtToken", res.data.accessToken);
@@ -43,10 +43,32 @@ const Login: React.FC = () => {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        toast.error(`Invalid Credentials.`);
+        toast.error("Invalid Credentials.");
+      } else {
+        console.log(`Unexpected Error Occurred! ${error}`);
       }
-      console.log(`Unexpredted Error Occured! ${error}`);
     }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    try {
+      const token = credentialResponse.credential;
+      const res = await axios.post(`${API_URL}/google-login`, { token });
+      console.log("res", res);
+      if (res.data.success) {
+        toast.success("Google Login successful!");
+        sessionStorage.setItem("jwtToken", res.data.jwtToken);
+        sessionStorage.setItem("userDetails", JSON.stringify(res.data.user));
+        window.location.href = "/";
+      }
+    } catch (error) {
+      toast.error("Google Sign-In failed. Please try again.");
+      console.error("Google Sign-In Error:", error);
+    }
+  };
+
+  const handleGoogleFailure = () => {
+    toast.error("Google Sign-In failed. Please try again.");
   };
 
   return (
@@ -56,7 +78,7 @@ const Login: React.FC = () => {
         <p className="text-sm text-gray-500 text-start mt-2">
           Don't have an account?{" "}
           <Link to={"/signup"} className="text-primary font-medium">
-            signup here
+            Sign up here
           </Link>
         </p>
 
@@ -94,6 +116,7 @@ const Login: React.FC = () => {
               </p>
             )}
           </div>
+
           <div className="mt-4 flex flex-row items-center justify-between">
             <div className="flex flex-row items-center">
               <input
@@ -105,7 +128,7 @@ const Login: React.FC = () => {
                 htmlFor="remember_me"
                 className="block text-sm font-medium cursor-pointer text-dark"
               >
-                Remeber Me
+                Remember Me
               </label>
             </div>
             <div>
@@ -117,6 +140,7 @@ const Login: React.FC = () => {
               </Link>
             </div>
           </div>
+
           <button
             type="submit"
             className={`w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 focus:outline-none flex text-center items-center justify-center focus:ring focus:ring-indigo-300 mt-6 ${
@@ -127,8 +151,14 @@ const Login: React.FC = () => {
           </button>
         </form>
 
-        
+        <div className="mt-6">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleFailure}
+          />
+        </div>
       </div>
+
       <div className="hidden md:flex flex-col items-center rounded-tr-lg rounded-br-lg justify-center bg-transparent shadow-lg shadow-gray-300 w-full max-w-md h-[500px]">
         <img
           src={logo}
@@ -136,7 +166,7 @@ const Login: React.FC = () => {
           className="object-contain select-none"
         />
         <p className="opacity-40 cursor-default select-none -mt-4">
-          <em>creativity start's here</em>
+          <em>creativity starts here</em>
         </p>
       </div>
     </div>

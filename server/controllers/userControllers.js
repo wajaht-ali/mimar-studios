@@ -2,6 +2,10 @@ import createHttpError from "http-errors";
 import UserModel from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { OAuth2Client } from "google-auth-library";
+import { generateJwtToken } from "../utils/helpers.js";
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const registerUserController = async (req, res, next) => {
   try {
@@ -33,6 +37,40 @@ export const registerUserController = async (req, res, next) => {
   }
 };
 
+export const googleSignupCOntroller = async (req, res, next) => {
+  const { token } = req.body;
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: `${process.env.GOOGLE_CLIENT_ID}`,
+    });
+    const payload = ticket.getPayload();
+    const { sub, email, name } = payload;
+
+    let user = await UserModel.findOne({ email });
+
+    if (!user) {
+      user = new UserModel({
+        googleId: sub,
+        email,
+        name,
+      });
+      await user.save();
+    }
+    const jwtToken = generateJwtToken({ userId: user._id, email });
+
+    res.status(200).send({
+      success: true,
+      message: "Google signup successful",
+      jwtToken,
+      user,
+    });
+  } catch (error) {
+    console.log("Error with Google signup:", error);
+    return next(createHttpError(400, "Error with Google API"));
+  }
+};
+
 export const loginUserController = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -61,6 +99,32 @@ export const loginUserController = async (req, res, next) => {
     });
   } catch (error) {
     return next(createHttpError(400, `Error with user login ${error}`));
+  }
+};
+
+export const googleLoginController = async (req, res, next) => {
+  const { token } = req.body;
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: `${process.env.GOOGLE_CLIENT_ID}`,
+    });
+    const payload = ticket.getPayload();
+    const { sub, email, name } = payload;
+    const jwtToken = generateJwtToken({ userId: sub, email });
+
+    res.status(200).send({
+      success: true,
+      message: "Google login successful",
+      jwtToken,
+      user: {
+        name,
+        email,
+      },
+    });
+  } catch (error) {
+    console.log(`Error with google login ${error}`);
+    return next(createHttpError(400, "false", "Error with google api"));
   }
 };
 

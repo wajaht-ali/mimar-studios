@@ -1,15 +1,16 @@
 import React, { useState } from "react";
-// import img from "../assets/images/portfolioLogNoBg.png";
 import { FaBars, FaTimes } from "react-icons/fa";
 import logo from "../../assets/mimar_Logo-nobg.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
-const Navbar = () => {
-  const [nav, setNav] = useState(false);
+const Navbar: React.FC = () => {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const [nav, setNav] = useState<boolean>(false);
   const handleNavIcon = () => {
     setNav(!nav);
   };
-
   const handleClick = () => setNav(!nav);
 
   return (
@@ -33,13 +34,26 @@ const Navbar = () => {
           <li className="py-2 px-4 hover:bg-[#0fd9a] hover:text-blue-500 cursor-pointer">
             <Link to="/docs">Docs</Link>
           </li>
-          {/* <li className="py-2 px-4 hover:bg-[#0fd9a] hover:text-blue-500 cursor-pointer">
-            <Link to="contact">Contact</Link>
-          </li> */}
+          <li>
+            {user ? (
+              <button
+                onClick={logout}
+                className="bg-primary hover:bg-primary/80 text-white mr-2 rounded-md py-2 px-4 outline-none"
+              >
+                Logout
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate("/login")}
+                className="bg-primary hover:bg-primary/80 text-white mr-2 rounded-md py-2 px-4 outline-none"
+              >
+                Signin
+              </button>
+            )}
+          </li>
         </ul>
       </div>
 
-      {/* Hambuger */}
       <div
         onClick={handleNavIcon}
         className="block md:hidden z-10 hover:cursor-pointer mx-4 text-gray-100"
@@ -48,7 +62,6 @@ const Navbar = () => {
         {!nav ? <FaBars fill="#333" size={25} /> : <FaTimes size={25} />}
       </div>
 
-      {/* Mobile Menu */}
       <ul
         className={
           !nav
@@ -57,7 +70,6 @@ const Navbar = () => {
         }
       >
         <li className="py-6 text-3xl cursor-pointer text-light">
-          {/* <Link to='contact' smooth={true} duration={500}>Home</Link> */}
           <Link onClick={handleClick} to="/">
             Home
           </Link>
@@ -71,6 +83,23 @@ const Navbar = () => {
           <Link onClick={handleClick} to="/docs">
             Docs
           </Link>
+        </li>
+        <li>
+          {user ? (
+            <button
+              onClick={logout}
+              className="bg-primary hover:bg-primary/80 text-white mr-2 rounded-md py-2 px-4 outline-none"
+            >
+              Logout
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate("/login")}
+              className="bg-primary hover:bg-primary/80 text-white mr-2 rounded-md py-2 px-4 outline-none"
+            >
+              Signin
+            </button>
+          )}
         </li>
       </ul>
     </div>

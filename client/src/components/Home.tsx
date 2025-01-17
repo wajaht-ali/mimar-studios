@@ -20,11 +20,14 @@ const Home = () => {
     email: "",
     id: "",
   });
+
   useEffect(() => {
     const token = sessionStorage.getItem("jwtToken");
-    if (!token) {
+    const isToastVisible = toast.isActive("login-required-toast");
+
+    if (!token && !isToastVisible) {
+      toast.warning("Login Required!", { toastId: "login-required-toast" });
       navigate("/login");
-      toast.warning("Login Required!");
     }
   }, []);
 

@@ -1,6 +1,4 @@
 import express from "express";
-// import globalErrorhandler from "./middlewares/globalErrorHandler";
-// import userRouter from "./routes/userRouter";
 import cors from "cors";
 import connectDB from "./services/db.js";
 import { config } from "dotenv";
@@ -11,7 +9,6 @@ config();
 const app = express();
 const port = process.env.PORT || 8080;
 
-// cors
 app.use(
   cors({
     origin: "*",
@@ -19,19 +16,17 @@ app.use(
     credentials: true,
   })
 );
-
-// json data configuration
 app.use(express.json());
 
 app.get("/", (req, res) => {
   res.status(200).send({ message: "Server is running!" });
 });
 
+// user rouets
 app.use("/api", userRouter);
 
 
 app.use(globalErrorHandler);
-
 connectDB();
 
 app.listen(port, () => {

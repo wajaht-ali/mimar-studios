@@ -64,7 +64,7 @@ const columns = [
   },
   {
     name: "Password",
-    selector: (data: UserData) => data.password,
+    selector: (data: UserData) => data.password || "******",
   },
 ];
 

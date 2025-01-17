@@ -2,13 +2,14 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { FcGoogle } from "react-icons/fc";
+// import { FcGoogle } from "react-icons/fc";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Spinners from "../Spinners";
 import logo from "../../assets/mimar_Logo-nobg.png";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { GoogleLogin } from "@react-oauth/google"; // Import GoogleLogin component
 
 const signupSchema = z.object({
   name: z.string().min(1, "Name is required."),
@@ -29,6 +30,8 @@ const Signup: React.FC = () => {
   });
 
   const API_URL = import.meta.env.VITE_APP_URL;
+
+  // Function to handle regular signup
   const onSubmit = async (data: SignupFormValues) => {
     try {
       const { name, email, password } = data;
@@ -39,16 +42,35 @@ const Signup: React.FC = () => {
       });
       console.log("res is: ", res);
       if (res.data.success) {
-        toast.success("Signup successfull!");
+        toast.success("Signup successful!");
         navigate("/login");
       } else {
         toast.error(`${res.data.message}`);
       }
     } catch (error) {
-      if(axios.isAxiosError(error)) {
+      if (axios.isAxiosError(error)) {
         toast.error(`Please try again.`);
       }
-      console.log(`Unexpredted Error Occured! ${error}`);
+      console.log(`Unexpected Error Occurred! ${error}`);
+    }
+  };
+
+  const googleSignupHandler = async (response: any) => {
+    try {
+      const { credential } = await response;
+      const res = await axios.post(`${API_URL}/google-signup`, {
+        token: credential,
+      });
+      console.log("Res: ", res);
+      if (res.data.success) {
+        toast.success("Signup successful with Google!");
+        sessionStorage.setItem("jwtToken", res.data.jwtToken);
+        sessionStorage.setItem("userDetails", JSON.stringify(res.data.user));
+        window.location.href = "/";
+      }
+    } catch (error) {
+      toast.error("Google signup failed! Please try again.");
+      console.error("Error with Google signup", error);
     }
   };
 
@@ -128,10 +150,18 @@ const Signup: React.FC = () => {
           <div className="w-[30%] border border-borderGray"></div>
         </div>
 
-        <button className="mt-4 w-full flex items-center justify-center bg-white border border-gray-300 text-dark py-2 px-4 rounded-md shadow-sm hover:bg-gray-50">
-          <FcGoogle className="mr-2 text-xl" /> Continue with Google
-        </button>
+        {/* Google Signup Button */}
+        <div className="mt-4">
+          <GoogleLogin
+            onSuccess={googleSignupHandler}
+            onError={() =>
+              toast.error("Google Sign-In failed. Please try again.")
+            }
+            useOneTap={true}
+          />
+        </div>
       </div>
+
       <div className="hidden md:flex flex-col items-center rounded-tr-lg rounded-br-lg justify-center bg-transparent shadow-lg shadow-gray-300 w-full max-w-md h-[600px]">
         <img
           src={logo}
@@ -139,7 +169,7 @@ const Signup: React.FC = () => {
           className="object-contain select-none"
         />
         <p className="opacity-40 cursor-default select-none -mt-4">
-          <em>creativity start's here</em>
+          <em>creativity starts here</em>
         </p>
       </div>
     </div>
