@@ -1,9 +1,10 @@
 import createHttpError from "http-errors";
 import UserModel from "../models/userModel.js";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
-import { generateJwtToken } from "../utils/helpers.js";
+import { generateJwtToken, sendMail } from "../utils/helpers.js";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -102,6 +103,53 @@ export const loginUserController = async (req, res, next) => {
   }
 };
 
+export const forgotPasswordController = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return next(createHttpError(400, "false", "Email is required!"));
+    }
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return next(createHttpError(404, "false", "User not found!"));
+    }
+
+    const otpNumber = crypto.randomInt(100000, 999999);
+    user.otp = otpNumber;
+    await user.save();
+
+    // send mail
+    const message = `
+      <h4>Dear ${user.name},</h4> <br>
+      <p>You have requested to reset your password.</p>
+      <p>Please copy and then paste the following OTP number in forgot password field.</p>
+      <div style="width: full; display: flex; justify-items: center; align-items: center;">
+      <p style="padding: 8px; background-color: #DFF2EB; color: #3C3D37; text-decoration: none; border-radius: 4px;">${otpNumber}</p>
+      </div>
+      <br>
+      <br>
+      <p>Please do not share this OTP with anyone. This OTP will automatically expire in next 90 seconds.</p>
+      <a style="color: blue;" href="http://localhost:3000/reset-password/${otpNumber}">http://localhost:3000/reset-password/${otpNumber}</a>`;
+
+    await sendMail(user.email, "Password Reset Request", message);
+    if (!sendMail) {
+      res.status(401).send({
+        success: false,
+        message: "Password reset link Error!",
+      });
+    }
+    res.status(200).send({
+      success: true,
+      message: "Password reset link sent to your email!",
+    });
+  } catch (error) {
+    console.log(`Nodemailer error ${error}`);
+    return next(
+      createHttpError(400, "false", `Error with resetting password ${error}`)
+    );
+  }
+};
+
 export const googleLoginController = async (req, res, next) => {
   const { token } = req.body;
   try {
@@ -113,6 +161,7 @@ export const googleLoginController = async (req, res, next) => {
     const { sub, email, name } = payload;
     const jwtToken = generateJwtToken({ userId: sub, email });
 
+    const userMatch = await UserModel.findOne({ email: email });
     res.status(200).send({
       success: true,
       message: "Google login successful",
@@ -120,6 +169,7 @@ export const googleLoginController = async (req, res, next) => {
       user: {
         name,
         email,
+        _id: userMatch ? userMatch._id : "",
       },
     });
   } catch (error) {

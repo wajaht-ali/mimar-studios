@@ -2,14 +2,13 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-// import { FcGoogle } from "react-icons/fc";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Spinners from "../Spinners";
 import logo from "../../assets/mimar_Logo-nobg.png";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { GoogleLogin } from "@react-oauth/google"; // Import GoogleLogin component
+import { GoogleLogin } from "@react-oauth/google";
 
 const signupSchema = z.object({
   name: z.string().min(1, "Name is required."),
@@ -31,7 +30,6 @@ const Signup: React.FC = () => {
 
   const API_URL = import.meta.env.VITE_APP_URL;
 
-  // Function to handle regular signup
   const onSubmit = async (data: SignupFormValues) => {
     try {
       const { name, email, password } = data;
@@ -150,7 +148,6 @@ const Signup: React.FC = () => {
           <div className="w-[30%] border border-borderGray"></div>
         </div>
 
-        {/* Google Signup Button */}
         <div className="mt-4">
           <GoogleLogin
             onSuccess={googleSignupHandler}
@@ -167,6 +164,7 @@ const Signup: React.FC = () => {
           src={logo}
           alt="mimar_logo"
           className="object-contain select-none"
+          loading="lazy"
         />
         <p className="opacity-40 cursor-default select-none -mt-4">
           <em>creativity starts here</em>

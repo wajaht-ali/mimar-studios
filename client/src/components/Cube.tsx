@@ -6,7 +6,9 @@ const ThreeDViewer: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current) {
+      return;
+    }
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color("0xf3f3f3");

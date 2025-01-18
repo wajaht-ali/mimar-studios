@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Spinners from "./Spinners";
 
-// Define the type for the quote data
 type QuoteData = {
   quote: string;
   author: string;

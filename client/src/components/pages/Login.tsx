@@ -54,7 +54,6 @@ const Login: React.FC = () => {
     try {
       const token = credentialResponse.credential;
       const res = await axios.post(`${API_URL}/google-login`, { token });
-      console.log("res", res);
       if (res.data.success) {
         toast.success("Google Login successful!");
         sessionStorage.setItem("jwtToken", res.data.jwtToken);
@@ -164,6 +163,7 @@ const Login: React.FC = () => {
           src={logo}
           alt="mimar_logo"
           className="object-contain select-none"
+          loading="lazy"
         />
         <p className="opacity-40 cursor-default select-none -mt-4">
           <em>creativity starts here</em>

@@ -11,6 +11,9 @@ import { ToastContainer, Bounce } from "react-toastify";
 import UpdateUser from "./components/pages/UpdateUser";
 import { AuthProvider } from "./context/AuthContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import Docs from "./components/pages/Docs";
+import About from "./components/pages/About";
+import ForgotPassword from "./components/pages/ForgotPassword";
 
 function App() {
   const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -24,6 +27,9 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/docs" element={<Docs />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/update-user/:id" element={<UpdateUser />} />
               <Route path="/*" element={<NotFound />} />
             </Routes>
@@ -35,8 +41,6 @@ function App() {
               closeOnClick={false}
               rtl={false}
               pauseOnFocusLoss
-              draggable
-              pauseOnHover
               theme="light"
               transition={Bounce}
             />
