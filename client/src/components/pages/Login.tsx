@@ -166,7 +166,7 @@ const Login: React.FC = () => {
           loading="lazy"
         />
         <p className="opacity-40 cursor-default select-none -mt-4">
-          <em>creativity starts here</em>
+          <em>mimAR studios</em>
         </p>
       </div>
     </div>

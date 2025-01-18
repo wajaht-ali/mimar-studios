@@ -19,7 +19,7 @@ const Navbar: React.FC = () => {
       className="sticky w-full h-[80px] flex justify-between items-center px-4 text-dark shadow-sm shadow-gray-300 z-10"
     >
       <div>
-        <Link to={"home"} className="cursor-pointer outline-none border-none">
+        <Link to={"/"} className="cursor-pointer outline-none border-none">
           <img src={logo} alt="img_logo" />
         </Link>
       </div>
@@ -27,9 +27,6 @@ const Navbar: React.FC = () => {
         <ul className="flex justify-between items-center w-full">
           <li className="py-2 px-4 hover:text-blue-500 cursor-pointer">
             <Link to="/">Home</Link>
-          </li>
-          <li className="py-2 px-4 hover:text-blue-500 cursor-pointer">
-            <Link to="/about">About</Link>
           </li>
           <li className="py-2 px-4 hover:bg-[#0fd9a] hover:text-blue-500 cursor-pointer">
             <Link to="/docs">Docs</Link>
@@ -72,11 +69,6 @@ const Navbar: React.FC = () => {
         <li className="py-6 text-3xl cursor-pointer text-light">
           <Link onClick={handleClick} to="/">
             Home
-          </Link>
-        </li>
-        <li className="py-6 text-3xl cursor-pointer text-light">
-          <Link onClick={handleClick} to="/about">
-            About
           </Link>
         </li>
         <li className="py-6 text-3xl cursor-pointer text-light">

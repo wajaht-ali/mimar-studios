@@ -3,6 +3,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import CardSkeleton from "./others/CardSkeleton";
+import weatherLogo from "../assets/weatherLogo.png";
 
 interface WheatherData {
   name: string;
@@ -38,6 +39,7 @@ const WeatherCard: React.FC = () => {
   const getWeatherData = async () => {
     try {
       const res = await axios.get(`${BASE_URL}&q=${city}`);
+      console.log("weather res: ", res);
       const weatherData = {
         name: res.data.location.name,
         localTime: res.data.location.localtime,
@@ -80,7 +82,7 @@ const WeatherCard: React.FC = () => {
           <div className="flex justify-center my-4">
             <div className="text-blue-500">
               <img
-                src={data.condition.icon}
+                src={data.condition.icon ? data.condition.icon : weatherLogo}
                 alt="img_icon"
                 className="size-16 object-contain"
               />

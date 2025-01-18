@@ -129,12 +129,9 @@ npm start
 
 ### Mobile Responsive Design
 
-![Mobile Responsive Screenshot](path-to-screenshot)
+![Mobile Responsive Screenshot](./client/src/assets/Mimar-Home-Page.png)
 
-### 3D Visualization
-
-![3D Cube Screenshot](path-to-screenshot)
-
+![Mobile Responsive Screenshot](./client/src/assets/Mimar-Mob-Home-Page.png)
 
 ## Contact
 
